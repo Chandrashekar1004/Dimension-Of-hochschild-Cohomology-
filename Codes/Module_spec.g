@@ -1,21 +1,21 @@
 LoadPackage("qpa");
-Read("Trying/Functions.g");
+Read("Codes/Functions.g");
 
 start_time := Runtime();
 
 Q:=MakeQuiver(4);
 
-# Read("Trying/A-ZALGEBRAS.g");
-Read("Trying/ALGEBRAS.g");
+# Read("Codes/A-ZALGEBRAS.g");
+Read("Codes/ALGEBRAS.g");
 
 
-main_path:="/home/csiyer/gap-4.14.0/Trying/";
+main_path:="/gap-4.14.0/Codes/";
 
 mod_spec := ComputeModuleSpec( A, type, main_path );
 
-Exec("/home/csiyer/myenv/bin/python3 /home/csiyer/gap-4.14.0/Trying/Coefficients.py");
+Exec("/myenv/bin/python3 /gap-4.14.0/Codes/Coefficients.py");
 
-Read(Concatenation("/home/csiyer/gap-4.14.0/Trying/",type,"/","final_coef.g"));
+Read(Concatenation("/gap-4.14.0/Codes/",type,"/","final_coef.g"));
 
 final_coef:=CoeffConversion(final_coef,K);;
 
@@ -30,11 +30,11 @@ ans3:=ComputeCohomology(proj_res,3);
 end_time := Runtime();
 elapsed := end_time - start_time;
 
-output := OutputTextFile(Concatenation("/home/csiyer/gap-4.14.0/Trying/", type, "/cohomology.txt"), false);;
+output := OutputTextFile(Concatenation("gap-4.14.0/Codes/", type, "/cohomology.txt"), false);;
 AppendTo(output, "dim1 = ", ans1, "\n");
 AppendTo(output, "dim2 = ", ans2, "\n");
 AppendTo(output, "dim3 = ", ans3, "\n");
-# AppendTo(output, "dim4 = ", ans4, "\n");
+
 
 AppendTo(output, "runtime = ", elapsed, " ms\n");
 CloseStream(output);
