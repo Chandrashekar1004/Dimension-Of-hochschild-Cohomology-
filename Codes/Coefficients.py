@@ -4,7 +4,7 @@ from fractions import Fraction
 from AllRels import rels,typ
 # from A_ZALGEBRAS import rels, typ
 
-req_basis, full_basis, mod_spec = read_gap_file(f"Trying/{typ}/{typ}")
+req_basis, full_basis, mod_spec = read_gap_file(f"Codes/{typ}/{typ}")
 # print(rels)
 
 basis_len2 = [p for p in full_basis if len(p) == 4]
@@ -49,105 +49,6 @@ paths_2to4_req = [p for p in basis_len2_req if p[1] == '2' and p[3] == '3']
 paths_1to2to3to4 = [p for p in basis_len3 if p[1] == '1' and p[3] == '2' and p[5] == '3']
 paths_1to2to3to4_req = [p for p in basis_len3_req if p[1] == '1' and p[3] == '2' and p[5] == '3']
 
-
-# # h=Fraction( -5,8)
-# # p=sp.I
-# # g=Fraction(11,19)
-# # f=Fraction(3,20)
-# a = sp.symbols('a')
-# b = sp.symbols('b')
-# d = sp.symbols('d')
-# e = sp.symbols('e')
-# f = sp.symbols('f')
-# g = sp.symbols('g')
-# h = sp.symbols('h')
-# i = sp.symbols('i')
-# j = sp.symbols('j')
-# k = sp.symbols('k')
-# l = sp.symbols('l')
-# alpha1 = sp.symbols('alpha1')
-# alpha2 = sp.symbols('alpha2')
-# alpha3 = sp.symbols('alpha3')
-
-
-
-# rels = [
-
-#     # -------- v1 -> v2 --------
-
-#     [(1, 'x1x2'),
-#      (a, 'y2z1'),
-#      (b, 'z2y1'),
-#      (d, 'x1w2'),
-#      (e, 'y2w1'),
-#      (f, 'z1w2'),
-#      (alpha1, 'w1w2')],
-
-#     [(1, 'y1y2'),
-#      (a, 'z2x1'),
-#      (b, 'x2z1'),
-#      (g, 'x1w2'),
-#      (h, 'y2w1'),
-#      (i, 'z1w2'),
-#      (alpha2, 'w1w2')],
-
-#     [(1, 'z1z2'),
-#      (a, 'x2y1'),
-#      (b, 'y2x1'),
-#      (j, 'x1w2'),
-#      (k, 'y2w1'),
-#      (l, 'z1w2'),
-#      (alpha3, 'w1w2')],
-
-#     [(1, 'x1w2'),
-#      (-1, 'w1x2')],
-
-#     [(1, 'y1w2'),
-#      (-1, 'w1y2')],
-
-#     [(1, 'z1w2'),
-#      (-1, 'w1z2')],
-
-#     # -------- v2 -> v3 --------
-
-#     [(1, 'x2x3'),
-#      (a, 'y3z2'),
-#      (b, 'z3y2'),
-#      (d, 'x2w3'),
-#      (e, 'y3w2'),
-#      (f, 'z2w3'),
-#      (alpha1, 'w2w3')],
-
-#     [(1, 'y2y3'),
-#      (a, 'z3x2'),
-#      (b, 'x3z2'),
-#      (g, 'x2w3'),
-#      (h, 'y3w2'),
-#      (i, 'z2w3'),
-#      (alpha2, 'w2w3')],
-
-#     [(1, 'z2z3'),
-#      (a, 'x3y2'),
-#      (b, 'y3x2'),
-#      (j, 'x2w3'),
-#      (k, 'y3w2'),
-#      (l, 'z2w3'),
-#      (alpha3, 'w2w3')],
-
-#     [(1, 'x2w3'),
-#      (-1, 'w2x3')],
-
-#     [(1, 'y2w3'),
-#      (-1, 'w2y3')],
-
-#     [(1, 'z2w3'),
-#      (-1, 'w2z3')],
-
-# ]
-# n = 3
-
-# primitive nth root of unity
-# p = sp.exp(2 * sp.pi * sp.I / n)
 
 
 path_index = {p: i for i, p in enumerate(basis_len2)}
@@ -276,10 +177,10 @@ def write_gap(obj):
     else:
         return str(obj)  # numbers remain as-is
 
-with open(f"Trying/{typ}/final_coef.g", "w") as f:
+with open(f"Codes/{typ}/final_coef.g", "w") as f:
     f.write("final_coef := " + write_gap(final_coef) + ";\n")
-replace_exp_with_zeta(f"Trying/{typ}/final_coef.g", n=3)
-fix_powers_in_file(f"Trying/{typ}/final_coef.g")
-fix_gap_file(f"Trying/{typ}/final_coef.g")
+replace_exp_with_zeta(f"Codes/{typ}/final_coef.g", n=3)
+fix_powers_in_file(f"Codes/{typ}/final_coef.g")
+fix_gap_file(f"Codes/{typ}/final_coef.g")
 print("Written successfully.")
 
