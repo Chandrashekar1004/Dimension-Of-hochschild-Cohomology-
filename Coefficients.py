@@ -1,0 +1,285 @@
+import sympy as sp
+from Output_cleaning import read_gap_file,fix_powers_in_file,replace_exp_with_zeta,fix_gap_file
+from fractions import Fraction
+from AllRels import rels,typ
+# from A_ZALGEBRAS import rels, typ
+
+req_basis, full_basis, mod_spec = read_gap_file(f"Trying/{typ}/{typ}")
+# print(rels)
+
+basis_len2 = [p for p in full_basis if len(p) == 4]
+basis_len3 = [p for p in full_basis if len(p) == 6]
+basis_len2_req = [p for p in req_basis if len(p) == 4]
+basis_len3_req = [p for p in req_basis if len(p) == 6]
+
+vertices=full_basis[:4]
+arrows=full_basis[4:4*4]
+
+one_hot_vertices = {
+    v: [1 if i == j else 0 for j in range(len(vertices))]
+    for i, v in enumerate(vertices)
+}
+
+arrows_1to2=arrows[:4]
+arrows_2to3=arrows[4:8]
+arrows_3to4=arrows[8:]
+
+
+arrows_1to2_enc = {
+    v: [1 if i == j else 0 for j in range(len(vertices))]
+    for i, v in enumerate(arrows_1to2)
+}
+arrows_2to3_enc = {
+    v: [1 if i == j else 0 for j in range(len(vertices))]
+    for i, v in enumerate(arrows_2to3)
+}
+arrows_3to4_enc = {
+    v: [1 if i == j else 0 for j in range(len(vertices))]
+    for i, v in enumerate(arrows_3to4)
+}
+
+
+paths_1to3 = [p for p in basis_len2 if p[1] == '1' and p[3] == '2']
+paths_2to4 = [p for p in basis_len2 if p[1] == '2' and p[3] == '3']
+
+
+paths_1to3_req = [p for p in basis_len2_req if p[1] == '1' and p[3] == '2']
+paths_2to4_req = [p for p in basis_len2_req if p[1] == '2' and p[3] == '3']
+
+paths_1to2to3to4 = [p for p in basis_len3 if p[1] == '1' and p[3] == '2' and p[5] == '3']
+paths_1to2to3to4_req = [p for p in basis_len3_req if p[1] == '1' and p[3] == '2' and p[5] == '3']
+
+
+# # h=Fraction( -5,8)
+# # p=sp.I
+# # g=Fraction(11,19)
+# # f=Fraction(3,20)
+# a = sp.symbols('a')
+# b = sp.symbols('b')
+# d = sp.symbols('d')
+# e = sp.symbols('e')
+# f = sp.symbols('f')
+# g = sp.symbols('g')
+# h = sp.symbols('h')
+# i = sp.symbols('i')
+# j = sp.symbols('j')
+# k = sp.symbols('k')
+# l = sp.symbols('l')
+# alpha1 = sp.symbols('alpha1')
+# alpha2 = sp.symbols('alpha2')
+# alpha3 = sp.symbols('alpha3')
+
+
+
+# rels = [
+
+#     # -------- v1 -> v2 --------
+
+#     [(1, 'x1x2'),
+#      (a, 'y2z1'),
+#      (b, 'z2y1'),
+#      (d, 'x1w2'),
+#      (e, 'y2w1'),
+#      (f, 'z1w2'),
+#      (alpha1, 'w1w2')],
+
+#     [(1, 'y1y2'),
+#      (a, 'z2x1'),
+#      (b, 'x2z1'),
+#      (g, 'x1w2'),
+#      (h, 'y2w1'),
+#      (i, 'z1w2'),
+#      (alpha2, 'w1w2')],
+
+#     [(1, 'z1z2'),
+#      (a, 'x2y1'),
+#      (b, 'y2x1'),
+#      (j, 'x1w2'),
+#      (k, 'y2w1'),
+#      (l, 'z1w2'),
+#      (alpha3, 'w1w2')],
+
+#     [(1, 'x1w2'),
+#      (-1, 'w1x2')],
+
+#     [(1, 'y1w2'),
+#      (-1, 'w1y2')],
+
+#     [(1, 'z1w2'),
+#      (-1, 'w1z2')],
+
+#     # -------- v2 -> v3 --------
+
+#     [(1, 'x2x3'),
+#      (a, 'y3z2'),
+#      (b, 'z3y2'),
+#      (d, 'x2w3'),
+#      (e, 'y3w2'),
+#      (f, 'z2w3'),
+#      (alpha1, 'w2w3')],
+
+#     [(1, 'y2y3'),
+#      (a, 'z3x2'),
+#      (b, 'x3z2'),
+#      (g, 'x2w3'),
+#      (h, 'y3w2'),
+#      (i, 'z2w3'),
+#      (alpha2, 'w2w3')],
+
+#     [(1, 'z2z3'),
+#      (a, 'x3y2'),
+#      (b, 'y3x2'),
+#      (j, 'x2w3'),
+#      (k, 'y3w2'),
+#      (l, 'z2w3'),
+#      (alpha3, 'w2w3')],
+
+#     [(1, 'x2w3'),
+#      (-1, 'w2x3')],
+
+#     [(1, 'y2w3'),
+#      (-1, 'w2y3')],
+
+#     [(1, 'z2w3'),
+#      (-1, 'w2z3')],
+
+# ]
+# n = 3
+
+# primitive nth root of unity
+# p = sp.exp(2 * sp.pi * sp.I / n)
+
+
+path_index = {p: i for i, p in enumerate(basis_len2)}
+
+def rel_vector(rel):
+    v = sp.zeros(1, len(basis_len2))
+    for c, p in rel:
+        v[0, path_index[p]] += c
+    return v
+
+
+R = sp.Matrix.vstack(*[rel_vector(r) for r in rels])
+
+R_rref, pivots = R.rref()
+# print(R_rref)
+def path_type(path):
+    # examples: x1y2 → 1→3, w2x3 → 2→4
+    if path[1] == "1":
+        return 1
+    elif path[1] == "2":
+        return 2
+    else:
+        raise ValueError(f"Unknown path type: {path}")
+
+def encode_path_exact(path):
+    # one-hot in full len2 space
+    v = sp.zeros(len(basis_len2), 1)
+    v[path_index[path], 0] = 1
+
+    # build B
+    B = sp.zeros(len(basis_len2), len(basis_len2_req))
+    for j, b in enumerate(basis_len2_req):
+        B[path_index[b], j] = 1
+
+    # solve v = B c + R^T α
+    M = B.row_join(R.T)
+    sol = M.gauss_jordan_solve(v)[0]
+
+    # --- NEW PART: slice by path type ---
+    pt = path_type(path)
+    type1 = len(paths_1to3_req)
+
+    if pt == 1:
+        return sp.Matrix(sol[:type1])
+    elif pt == 2:
+        return sp.Matrix(sol[type1:type1 + len(paths_2to4_req)]).T
+    else:
+        raise ValueError(f"Unknown path type for {path}")
+
+new_rels=[]
+for rel in rels:
+    for a in arrows:
+      if int(a[1])<int(rel[0][1][1]):
+        new_rel=[]
+        for r in rel:
+          new_rel.append((r[0],a+r[1]))
+        new_rels.append(new_rel)
+      if int(a[1])>int(rel[0][1][3]):
+        new_rel=[]
+        for r in rel:
+          new_rel.append((r[0],r[1]+a))
+        new_rels.append(new_rel)
+
+path_index3 = {p: i for i, p in enumerate(basis_len3)}
+
+def rel_vector(rel):
+    v = sp.zeros(1, len(basis_len3))
+    for c, p in rel:
+        v[0, path_index3[p]] += c
+    return v
+
+
+R3 = sp.Matrix.vstack(*[rel_vector(r) for r in new_rels])
+# print(R3)
+
+R_rref3, pivots3 = R3.rref()
+print("here")
+
+def encode_path_exact_3(path):
+    v = sp.zeros(len(basis_len3), 1)
+    v[path_index3[path], 0] = 1
+
+    # Solve v = B c + R^T α exactly
+    B = sp.zeros(len(basis_len3), len(basis_len3_req))
+    for j, b in enumerate(basis_len3_req):
+        B[path_index3[b], j] = 1
+
+    M = B.row_join(R3.T)
+    sol = M.gauss_jordan_solve(v)[0]
+
+    return sp.Matrix(sol[:len(basis_len3_req)]).T
+
+mod_spec_final={}
+for mod in mod_spec:
+  mod_spec_final[mod]=[]
+  for m in mod_spec[mod]:
+    # print("M:",len(m))
+    if m in vertices:
+      mod_spec_final[mod].append(list(one_hot_vertices[m]))
+    elif m in arrows_1to2:
+      mod_spec_final[mod].append(list(arrows_1to2_enc[m]))
+    elif m in arrows_2to3:
+      mod_spec_final[mod].append(list(arrows_2to3_enc[m]))
+    elif m in arrows_3to4:
+      mod_spec_final[mod].append(list(arrows_3to4_enc[m]))
+    elif m in paths_1to3 or  m in paths_2to4:
+      mod_spec_final[mod].append(list(encode_path_exact(m)))
+    elif m in paths_1to2to3to4:
+      mod_spec_final[mod].append(list(encode_path_exact_3(m)))
+# print(mod_spec_final)
+
+final_coef=[]
+for mod in mod_spec_final:
+  l=[mod,mod_spec_final[mod]]
+  final_coef.append(l)
+
+def write_gap(obj):
+    """Recursively convert Python object to GAP code string"""
+    if isinstance(obj, list):
+        return "[ " + ", ".join(write_gap(x) for x in obj) + " ]"
+    elif isinstance(obj, dict):
+        items = ", ".join(f"{write_gap(k)} => {write_gap(v)}" for k, v in obj.items())
+        return f"[ {items} ]"
+    elif isinstance(obj, str):
+        return f'"{obj}"'  # wrap Python string in GAP quotes
+    else:
+        return str(obj)  # numbers remain as-is
+
+with open(f"Trying/{typ}/final_coef.g", "w") as f:
+    f.write("final_coef := " + write_gap(final_coef) + ";\n")
+replace_exp_with_zeta(f"Trying/{typ}/final_coef.g", n=3)
+fix_powers_in_file(f"Trying/{typ}/final_coef.g")
+fix_gap_file(f"Trying/{typ}/final_coef.g")
+print("Written successfully.")
+
