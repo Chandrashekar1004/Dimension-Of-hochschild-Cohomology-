@@ -1,0 +1,4 @@
+dim1 = 1
+dim2 = 8
+dim3 = 12
+runtime = 3496880 ms
